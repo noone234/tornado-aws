@@ -25,6 +25,7 @@ except ImportError:  # pragma: nocover
 
 
 from tornado import concurrent, httpclient, ioloop
+from tornado import version_info as tornado_version_info
 
 try:
     from tornado import curl_httpclient
@@ -586,7 +587,10 @@ class AsyncAWSClient(AWSClient):
         :raises: :class:`~tornado_aws.exceptions.NoCredentialsError`
 
         """
-        future = concurrent.TracebackFuture()
+        if tornado_version_info[0] <= 4:
+            future = concurrent.TracebackFuture()
+        else:
+            future = concurrent.Future()
 
         def on_response(response):
             exception = response.exception()
